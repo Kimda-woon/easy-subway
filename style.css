@@ -83,11 +83,23 @@ button.ghost { background: #fff; border: 3px solid var(--line); font-size: 1.05r
 .step-head .no { background: rgba(255,255,255,.95); color: var(--ink); width: 2rem; height: 2rem; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .step-body { padding: .9rem 1rem 1rem; }
 .step-body p { margin: .35rem 0; font-size: 1.1rem; }
-.dir { background: #eef3ff; border-left: 8px solid var(--brand); padding: .6rem .8rem; border-radius: .5rem; font-size: 1.2rem; font-weight: 800; }
-.dir small { display: block; font-weight: 600; color: var(--sub); font-size: .85rem; }
-.next { background: #e7f6ec; border-left: 8px solid var(--ok); padding: .6rem .8rem; border-radius: .5rem; font-weight: 700; }
-.alight { background: #fff0f0; border-left: 8px solid var(--warn); padding: .6rem .8rem; border-radius: .5rem; font-weight: 800; font-size: 1.2rem; }
-.alight em, .dir em, .next em { font-style: normal; font-size: 1.15em; text-decoration: underline; text-underline-offset: .15em; }
+/* 다음 역 그림 */
+.route { position: relative; margin: .2rem 0 .5rem; padding-left: 3.4rem; }
+.route::before { content: ''; position: absolute; left: 1rem; top: 1rem; bottom: 1rem; width: 12px; border-radius: 6px; background: var(--c); }
+.rt-row { position: relative; padding: .35rem 0; }
+.rt-row small { display: block; color: var(--sub); font-size: .85rem; font-weight: 700; }
+.rt-name { display: block; font-size: 1.3rem; font-weight: 800; line-height: 1.25; }
+.rt-node { position: absolute; left: -2rem; top: 50%; transform: translate(-50%, -50%); background: #fff; border: 6px solid var(--c); border-radius: 50%; }
+.rt-n-from { width: 1.6rem; height: 1.6rem; }
+.rt-n-end { width: 1.6rem; height: 1.6rem; border-radius: .4rem; background: var(--c); }
+.rt-n-next { width: 2.6rem; height: 2.6rem; border-width: 8px; background: #fff3bf; }
+.rt-next { background: #fff3bf; border: 4px solid #f2c200; border-radius: 1rem; padding: .7rem .9rem; margin: .1rem 0; }
+.rt-chip { display: inline-block; background: var(--ink); color: #fff; border-radius: 999px; padding: .1rem .75rem; font-size: .95rem; font-weight: 800; }
+.rt-big { display: block; margin-top: .3rem; font-size: 1.9rem; font-weight: 900; line-height: 1.2; word-break: keep-all; overflow-wrap: anywhere; white-space: nowrap; }
+.rt-sign { margin-top: .35rem; }
+.rt-move { display: flex; align-items: center; flex-wrap: wrap; gap: 0 .15rem; padding: .3rem 0; color: var(--c); font-weight: 800; }
+.rt-move svg { display: block; margin-bottom: -.1rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); }
+.rt-move span { margin-left: .4rem; color: var(--ink); font-size: .95rem; }
 details { margin-top: .6rem; }
 summary { min-height: 2.8rem; display: flex; align-items: center; font-weight: 700; color: var(--brand); cursor: pointer; }
 .stops { margin: .2rem 0 0; padding-left: 0; list-style: none; }

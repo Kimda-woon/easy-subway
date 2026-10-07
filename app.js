@@ -14,6 +14,7 @@
     document.documentElement.style.setProperty('--scale', s);
     document.querySelectorAll('.size button').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.scale === s)); });
     save('subway.scale', s);
+    if (typeof fitNames === 'function' && !$('result').hidden) fitNames();
   }
   document.querySelector('.size').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (b) setScale(+b.dataset.scale);
@@ -120,21 +121,37 @@
   }
 
   // ---------- 길 찾기 ----------
-  function dirText(ride) {
-    var s = '<em>' + yeok(ride.next) + '</em> 쪽으로 가는 열차';
-    var shown = ride.labels.slice(0, 2).join('” 또는 “') + (ride.labels.length > 2 ? '” 등' : '”');
-    var sign = ride.labels.length ? '<small>표지판에는 보통 “' + shown + '이라고 나와요 (중간에서 돌아가는 열차도 있어요)</small>' : '';
-    return '<div class="dir">' + s + sign + '</div>';
+  // 다음 역 이름이 칸 너비에 한 줄로 들어오도록 글자 크기를 줄인다 ('역' 글자만 다음 줄로 떨어지는 것 방지)
+  function fitNames() {
+    document.querySelectorAll('.rt-big').forEach(function (el) {
+      el.style.whiteSpace = 'nowrap'; el.style.fontSize = '';
+      var size = parseFloat(getComputedStyle(el).fontSize);
+      while (el.scrollWidth > el.clientWidth && size > 16) { size -= 1; el.style.fontSize = size + 'px'; }
+      if (el.scrollWidth > el.clientWidth) el.style.whiteSpace = 'normal';  // 그래도 안 들어가면 줄바꿈 허용
+    });
+  }
+
+  // 다음 역을 그림으로: 지금 역 → [다음 역(크게)] → 내리는 역 (호선 색 선 위에)
+  function routeVisual(ride) {
+    var chev = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 8l7 7 7-7" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var last = ride.stops === 1;
+    var sign = ride.labels.length ? '<small class="rt-sign">표지판에는 “' + ride.labels.slice(0, 2).join('” 또는 “') + (ride.labels.length > 2 ? '” 등' : '”') + '이라고 나와요</small>' : '';
+    var h = '<div class="route" style="--c:' + ride.line.color + '">';
+    h += '<div class="rt-row"><span class="rt-node rt-n-from"></span><small>지금 타는 역</small><b class="rt-name">' + yeok(ride.from) + '</b></div>';
+    h += '<div class="rt-move">' + chev + chev + chev + '<span>이쪽으로 출발</span></div>';
+    h += '<div class="rt-row rt-next"><span class="rt-node rt-n-next"></span><span class="rt-chip">다음 역' + (last ? ' · 여기서 내려요' : '') + '</span><b class="rt-big">' + yeok(ride.next) + '</b>' + sign + '</div>';
+    if (!last) {
+      h += '<div class="rt-move">' + chev + '<span>' + (ride.stops - 1) + '정거장 더 가요</span></div>';
+      h += '<div class="rt-row"><span class="rt-node rt-n-end"></span><small>내리는 역 (타고 모두 ' + ride.stops + '정거장)</small><b class="rt-name">' + yeok(ride.to) + '</b></div>';
+    }
+    return h + '</div>';
   }
 
   function stepHtml(ride, no) {
     var l = ride.line, c = l.color;
     var h = '<div class="step"><div class="step-head" style="background:' + c + ';color:' + l.text + '"><span class="no">' + no + '</span>' +
       yeok(ride.from) + '에서 ' + l.name + ' 타기 (' + l.colorName + ')</div><div class="step-body">';
-    h += '<p>이쪽으로 가는 열차를 타세요.</p>' + dirText(ride);
-    h += '<p class="next">탄 뒤 <em>첫 번째로 서는 역</em>이 <em>' + yeok(ride.next) + '</em>이면 제대로 탄 거예요. 다르면 반대 방향이니, 내려서 건너편에서 다시 타세요.</p>';
-    h += '<p class="alight"><em>' + ride.stops + '정거장</em> 가서 <em>' + yeok(ride.to) + '</em>에서 내리세요.' +
-      (ride.beforeLast ? '<br><small>바로 전 역은 ' + yeok(ride.beforeLast) + '이에요.</small>' : '') + '</p>';
+    h += routeVisual(ride);
     h += '<details><summary>지나가는 역 모두 보기 (' + (ride.stops + 1) + '개)</summary><ul class="stops" style="--c:' + c + '">' +
       ride.stations.map(function (s, i) {
         var edge = i === 0 || i === ride.stations.length - 1;
@@ -194,6 +211,7 @@
     var res = $('result');
     res.innerHTML = html;
     res.hidden = false;
+    fitNames();
     res.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   $('go').addEventListener('click', find);
