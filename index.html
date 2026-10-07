@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" class="loading">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,8 +13,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="쉬운 지하철">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <!-- 파일을 고칠 때마다 아래 ?v= 값을 바꾸세요. 폰이 옛 파일을 기억하고 있는 것을 막아 줍니다. -->
-  <link rel="stylesheet" href="style.css?v=20261007c">
+  <!-- 스타일이 붙기 전에 깜빡이지 않게 잠깐 숨긴다 (자바스크립트가 꺼져 있으면 바로 보인다) -->
+  <style>html.loading body { visibility: hidden; }</style>
+  <noscript><style>html.loading body { visibility: visible; }</style></noscript>
 </head>
 <body>
   <header class="top">
@@ -67,8 +68,33 @@
   </div>
 
 
-  <script src="data.js?v=20261007c"></script>
-  <script src="router.js?v=20261007c"></script>
-  <script src="app.js?v=20261007c"></script>
+  <!-- 앱 파일 불러오기: 먼저 항상 최신인 version.json 을 확인하고, 그 번호를 붙여 불러온다.
+       그래서 이 index.html 이 폰에 옛 것으로 남아 있어도 앱 코드와 스타일은 늘 최신이다.
+       앱을 고칠 때는 version.json 의 v 값만 바꾸면 된다. -->
+  <script>
+  (function () {
+    var FALLBACK = '20261007d', started = false;
+    function show() { document.documentElement.classList.remove('loading'); }
+    function start(v) {
+      if (started) return;
+      started = true;
+      var css = document.createElement('link');
+      css.rel = 'stylesheet'; css.href = 'style.css?v=' + v;
+      css.onload = show; css.onerror = show;
+      document.head.appendChild(css);
+      ['data.js', 'router.js', 'app.js'].forEach(function (f) {
+        var s = document.createElement('script');
+        s.src = f + '?v=' + v; s.async = false;     // 순서대로 실행
+        document.body.appendChild(s);
+      });
+      setTimeout(show, 3000);                       // 무슨 일이 있어도 화면은 보이게
+    }
+    var timer = setTimeout(function () { start(FALLBACK); }, 2500);
+    fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { clearTimeout(timer); start(String((j && j.v) || FALLBACK)); })
+      .catch(function () { clearTimeout(timer); start(FALLBACK); });
+  })();
+  </script>
 </body>
 </html>

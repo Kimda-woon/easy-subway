@@ -19,6 +19,7 @@ https 주소(GitHub Pages)를 폰 브라우저로 열면 바로 쓸 수 있습�
 | `data.js` | 노선별 역 순서 (지선은 path 별도, 순환선은 `ring: true`) |
 | `router.js` | 길찾기(정거장 2분, 환승 가중치 12) + 방향 이름 만들기 |
 | `app.js`, `style.css`, `index.html` | 화면 |
+| `version.json` | 앱을 고칠 때마다 `v` 값을 바꿈. 폰이 옛 파일을 기억하는 것을 막는 번호 |
 | `manifest.json`, `icons/` | 브라우저 "홈 화면에 추가" 때 쓰는 이름·아이콘 |
 | `router.test.js` | `node router.test.js` — 길찾기 검증 |
 | `verify.js` | `node verify.js <역목록.csv>` — 외부 역 목록과 이름·순서 대조 |
