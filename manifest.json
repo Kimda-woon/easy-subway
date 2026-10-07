@@ -1,0 +1,17 @@
+{
+  "name": "쉬운 지하철",
+  "short_name": "쉬운지하철",
+  "description": "지하철이 어려운 분을 위한 길 안내: 어느 호선, 어느 방향, 어디서 갈아타는지 알려드려요.",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6fb",
+  "theme_color": "#1b4fd8",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

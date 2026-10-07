@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1b4fd8">
+  <title>쉬운 지하철</title>
+  <meta name="description" content="지하철 길 안내: 어느 호선, 어느 방향, 어디서 갈아타는지 알려드려요.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="쉬운 지하철">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>🚇 쉬운 지하철</h1>
+    <div class="size" role="group" aria-label="글자 크기">
+      <button type="button" data-scale="1" aria-label="보통 글자">가</button>
+      <button type="button" data-scale="1.25" class="m" aria-label="큰 글자">가</button>
+      <button type="button" data-scale="1.5" class="l" aria-label="아주 큰 글자">가</button>
+    </div>
+  </header>
+
+  <noscript><p style="padding:1rem;font-size:1.2rem">이 앱은 자바스크립트가 켜져 있어야 써요. 브라우저 설정을 확인해 주세요.</p></noscript>
+
+  <main>
+    <section id="finder" class="card">
+      <div class="field">
+        <label for="from">어디서 타세요?</label>
+        <input id="from" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="역 이름 (예: 왕십리)" enterkeyhint="next">
+        <ul id="from-list" class="suggest" hidden></ul>
+      </div>
+
+      <button id="swap" type="button" class="ghost">⇅ 출발·도착 바꾸기</button>
+
+      <div class="field">
+        <label for="to">어디로 가세요?</label>
+        <input id="to" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="역 이름 (예: 돌곶이)" enterkeyhint="go">
+        <ul id="to-list" class="suggest" hidden></ul>
+      </div>
+
+      <p id="msg" class="msg" role="alert" hidden></p>
+      <button id="go" type="button" class="primary">길 알려주세요</button>
+
+      <div id="recent" hidden>
+        <h2>최근에 찾은 길</h2>
+        <div id="recent-list"></div>
+      </div>
+    </section>
+
+    <section id="result" hidden aria-live="polite"></section>
+  <section id="install" class="card install" hidden>
+    <h2>📱 폰 화면에 바로가기 만들기</h2>
+    <button id="install-btn" type="button" class="primary">홈 화면에 추가</button>
+    <p id="install-tip" hidden>아래 가운데 <b>공유 버튼(⬆︎)</b>을 누르고 <b>“홈 화면에 추가”</b>를 눌러 주세요.</p>
+  </section>
+  </main>
+
+  <footer>
+    서울 지하철 1~9호선, 경의중앙선, 수인분당선, 신분당선, 공항철도, GTX-A, 경춘선 안내예요.<br>
+    걸리는 시간은 대략적인 값이에요.
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="router.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
