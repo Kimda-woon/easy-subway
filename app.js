@@ -131,42 +131,29 @@
     });
   }
 
-  // 다음 역을 그림으로: 지금 역 → [다음 역(크게)] → 내리는 역 (호선 색 선 위에)
-  function routeVisual(ride) {
-    var chev = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 8l7 7 7-7" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    var last = ride.stops === 1;
-    var sign = ride.labels.length ? '<small class="rt-sign">표지판에는 “' + ride.labels.slice(0, 2).join('” 또는 “') + (ride.labels.length > 2 ? '” 등' : '”') + '이라고 나와요</small>' : '';
-    var h = '<div class="route" style="--c:' + ride.line.color + '">';
-    h += '<div class="rt-row"><span class="rt-node rt-n-from"></span><small>지금 타는 역</small><b class="rt-name">' + yeok(ride.from) + '</b></div>';
-    h += '<div class="rt-move">' + chev + chev + chev + '<span>이쪽으로 출발</span></div>';
-    h += '<div class="rt-row rt-next"><span class="rt-node rt-n-next"></span><span class="rt-chip">다음 역' + (last ? ' · 여기서 내려요' : '') + '</span><b class="rt-big">' + yeok(ride.next) + '</b>' + sign + '</div>';
-    if (!last) {
-      h += '<div class="rt-move">' + chev + '<span>' + (ride.stops - 1) + '정거장 더 가요</span></div>';
-      h += '<div class="rt-row"><span class="rt-node rt-n-end"></span><small>내리는 역 (타고 모두 ' + ride.stops + '정거장)</small><b class="rt-name">' + yeok(ride.to) + '</b></div>';
-    }
-    return h + '</div>';
-  }
+  // 아이콘 (글자 대신 그림으로)
+  var ICON_CHEV = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 8l7 7 7-7" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var ICON_TRAIN = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="5" y="2.5" width="14" height="15" rx="4" fill="currentColor"/><rect x="7.5" y="5" width="9" height="5" rx="1.5" fill="#fff"/><circle cx="9" cy="13.5" r="1.4" fill="#fff"/><circle cx="15" cy="13.5" r="1.4" fill="#fff"/><path d="M8 17.5L6 21.5M16 17.5l2 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  var ICON_SWAP = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 8h14m0 0l-4-4m4 4l-4 4M20 16H6m0 0l4-4m-4 4l4 4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-  function stepHtml(ride, no) {
-    var l = ride.line, c = l.color;
-    var h = '<div class="step"><div class="step-head" style="background:' + c + ';color:' + l.text + '"><span class="no">' + no + '</span>' +
-      yeok(ride.from) + '에서 ' + l.name + ' 타기 (' + l.colorName + ')</div><div class="step-body">';
-    h += routeVisual(ride);
-    h += '<details><summary>지나가는 역 모두 보기 (' + (ride.stops + 1) + '개)</summary><ul class="stops" style="--c:' + c + '">' +
-      ride.stations.map(function (s, i) {
-        var edge = i === 0 || i === ride.stations.length - 1;
-        return '<li class="' + (edge ? 'edge' : '') + '">' + yeok(s) + (i === 0 ? ' (타는 곳)' : edge ? ' (내리는 곳)' : '') + '</li>';
-      }).join('') + '</ul></details></div></div>';
-    return h;
+  // 타는 역 → [다음 역(크게)] → 내리는 역 을 호선 색 선 위에 그린다. 글자는 꼭 필요한 것만.
+  function stepHtml(ride) {
+    var l = ride.line, last = ride.stops === 1;
+    var h = '<div class="step" style="--c:' + l.color + '"><div class="step-head" style="background:' + l.color + ';color:' + l.text + '">' + ICON_TRAIN + '<b>' + l.name + '</b></div>';
+    h += '<div class="route">';
+    h += '<div class="rt-row"><span class="rt-node rt-n-from">' + ICON_TRAIN + '</span><b class="rt-name">' + yeok(ride.from) + '</b></div>';
+    h += '<div class="rt-move">' + ICON_CHEV + ICON_CHEV + ICON_CHEV + '</div>';
+    h += '<div class="rt-row rt-next"><span class="rt-node rt-n-next"></span><span class="rt-chip">다음' + (last ? ' · 내려요' : '') + '</span><b class="rt-big">' + yeok(ride.next) + '</b></div>';
+    if (!last) {
+      h += '<div class="rt-move">' + ICON_CHEV + '</div>';
+      h += '<div class="rt-row"><span class="rt-node rt-n-end"></span><span class="rt-chip out">내려요</span><span class="rt-count">' + ride.stops + '정거장</span><b class="rt-name">' + yeok(ride.to) + '</b></div>';
+    }
+    return h + '</div></div>';
   }
 
   function transferHtml(prev, next) {
     var same = prev.line.id === next.line.id;
-    return '<div class="transfer"><p><b>🔁 갈아타기</b></p>' +
-      (same
-        ? '<p>' + yeok(prev.to) + '에서 내린 뒤 ' + badge(next.line, next.line.name) + ' <b>다른 열차</b>로 갈아타세요. 같은 호선이지만 가는 길이 갈라져서 열차가 달라요.</p>'
-        : '<p>' + yeok(prev.to) + '에서 내린 뒤 ' + badge(next.line, next.line.name + ' (' + next.line.colorName + ')') + ' 표지판을 따라가세요.</p>') +
-      '<p>걷는 길이 길 수 있어요. 천천히 가세요.</p></div>';
+    return '<div class="transfer">' + ICON_SWAP + (same ? '' : badge(next.line)) + '<b>' + (same ? '다른 열차로 ' : '') + '갈아타요</b></div>';
   }
 
   function unresolvedMsg(text, what) {
@@ -197,16 +184,12 @@
     remember(a, b);
 
     var rides = route.rides;
-    var chain = rides.map(function (r) { return badge(r.line); }).join(' → ');
-    var html = '<div class="summary"><h2>' + yeok(a) + ' → ' + yeok(b) + '</h2>' +
-      '<div class="chain">' + chain + '</div>' +
-      '<p class="big">' + (route.transfers ? '갈아타는 곳 ' + route.transfers + '번' : '갈아타지 않아도 돼요') + ' · 약 ' + route.minutes + '분</p></div>';
-
+    var html = '<div class="chain">' + rides.map(function (r) { return badge(r.line); }).join(' <span class="arrow">→</span> ') + '</div>';
     rides.forEach(function (ride, i) {
       if (i > 0) html += transferHtml(rides[i - 1], ride);
-      html += stepHtml(ride, i + 1);
+      html += stepHtml(ride);
     });
-    html += '<div class="arrive">🎉 ' + yeok(b) + '에 도착해요!</div>';
+    html += '<div class="arrive">🎉 ' + yeok(b) + ' 도착</div>';
 
     var res = $('result');
     res.innerHTML = html;
