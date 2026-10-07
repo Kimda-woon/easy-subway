@@ -200,18 +200,62 @@
     remember(a, b);
 
     var rides = route.rides;
-    var html = '';
-    rides.forEach(function (ride, i) {
-      if (i > 0) html += transferBand(rides[i - 1], ride);
-      html += rideBlock(ride);
-    });
-
-    var res = $('result');
-    res.innerHTML = html;
-    res.hidden = false;
-    fitNames();
-    res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    openResult(rides.map(function (ride, i) {
+      return (i > 0 ? transferBand(rides[i - 1], ride) : '') + rideBlock(ride);
+    }));
   }
+
+  // ---------- 결과 화면: 한 번에 한 단계씩 (스크롤 없이 버튼·쓸어넘기기) ----------
+  var pages = [], cur = 0, lastFocus = null;
+
+  function setInert(on) {
+    ['main', 'header.top'].forEach(function (sel) { var el = document.querySelector(sel); if (el) el.inert = on; });
+  }
+  function showPage(i) {
+    cur = Math.max(0, Math.min(pages.length - 1, i));
+    var stage = $('rv-stage');
+    stage.innerHTML = pages[cur];
+    stage.scrollTop = 0;
+    fitNames();
+    $('rv-dots').innerHTML = pages.map(function (_, k) { return '<span class="' + (k === cur ? 'on' : '') + '"></span>'; }).join('');
+    $('rv-prev').style.visibility = cur === 0 ? 'hidden' : 'visible';
+    var last = cur === pages.length - 1;
+    $('rv-next').innerHTML = last ? '처음으로' : '다음 ' + ICON_ARROW;
+    $('rv-next').classList.toggle('done', last);
+  }
+  function openResult(list) {
+    pages = list;
+    lastFocus = document.activeElement;
+    $('result').hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+    setInert(true);
+    try { history.pushState({ r: 1 }, ''); } catch (e) {}   // 폰의 뒤로가기로도 돌아오게
+    showPage(0);
+    $('rv-next').focus();
+  }
+  function closeResult(fromPop) {
+    if ($('result').hidden) return;
+    $('result').hidden = true;
+    document.documentElement.style.overflow = '';
+    setInert(false);
+    if (!fromPop) { try { if (history.state && history.state.r) history.back(); } catch (e) {} }
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $('rv-next').addEventListener('click', function () { if (cur >= pages.length - 1) closeResult(); else showPage(cur + 1); });
+  $('rv-prev').addEventListener('click', function () { showPage(cur - 1); });
+  $('rv-back').addEventListener('click', function () { closeResult(); });
+  window.addEventListener('popstate', function () { closeResult(true); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeResult(); });
+  (function () {   // 옆으로 쓸어서 넘기기
+    var sx = 0, sy = 0, stage = $('rv-stage');
+    stage.addEventListener('touchstart', function (e) { sx = e.changedTouches[0].clientX; sy = e.changedTouches[0].clientY; }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      if (dx < 0 && cur < pages.length - 1) showPage(cur + 1);
+      else if (dx > 0 && cur > 0) showPage(cur - 1);
+    }, { passive: true });
+  })();
   $('go').addEventListener('click', find);
 
   renderRecent();

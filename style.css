@@ -10,6 +10,7 @@
   --ok: #0b6b3a;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* hidden 이면 다른 display 설정이 있어도 반드시 숨긴다 */
 html { font-size: calc(18px * var(--scale)); -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
@@ -73,7 +74,22 @@ button.ghost { background: #fff; border: 3px solid var(--line); font-size: 1.05r
 }
 
 /* ---- 결과: 호선 색 큰 면 + 큰 글자 (화면 가장자리까지) ---- */
-#result { margin: 16px -16px 0; }
+#result { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: #0b0b0c; color: #fff; }
+.rv-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; flex-shrink: 0; }
+#rv-back { min-height: 48px; padding: 0 16px 0 8px; border-radius: 14px; border: 2px solid rgba(255,255,255,.55); background: transparent; color: #fff; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 2px; }
+#rv-back svg { width: 1.5rem; height: 1.5rem; }
+#rv-dots { display: flex; align-items: center; gap: 8px; }
+#rv-dots span { width: 12px; height: 12px; border-radius: 6px; background: rgba(255,255,255,.35); }
+#rv-dots span.on { width: 34px; background: #fff; }
+#rv-stage { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; }
+#rv-stage .rb { flex: 1 0 auto; }
+#rv-stage .rb-band { flex-shrink: 0; }
+.rv-nav { display: flex; gap: 12px; padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); flex-shrink: 0; background: #0b0b0c; }
+.rv-nav button { min-height: 64px; border-radius: 18px; font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+#rv-prev { flex: 1; background: transparent; border: 2px solid rgba(255,255,255,.55); color: #fff; }
+#rv-next { flex: 2; background: #fff; color: #111827; border: 0; }
+#rv-next.done { background: #ffd84a; }
+#rv-next svg { width: 1.6rem; height: 1.6rem; }
 .rb { --u: calc(var(--scale) * .8px); position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: calc(var(--u) * 360); }
 .rb-decor { position: absolute; right: calc(var(--u) * -30); top: calc(var(--u) * -70); font-size: calc(var(--u) * 400); font-weight: 700; line-height: 1; pointer-events: none; }
 .rb-decor.sm { right: calc(var(--u) * -4); top: calc(var(--u) * 14); font-size: calc(var(--u) * 130); }
