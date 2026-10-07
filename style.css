@@ -72,33 +72,26 @@ button.ghost { background: #fff; border: 3px solid var(--line); font-size: 1.05r
   display: inline-block; padding: .05rem .6rem; border-radius: 999px; font-weight: 800; font-size: .95em; white-space: nowrap;
 }
 
-/* ---- 결과: 그림 위주 ---- */
-.chain { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; margin: 1.2rem 0 .2rem; }
-.chain .badge { font-size: 1.3rem; padding: .25rem 1rem; }
-.chain .arrow { font-size: 1.5rem; font-weight: 800; }
+/* ---- 결과: 호선 색 큰 면 + 큰 글자 (화면 가장자리까지) ---- */
+#result { margin: 16px -16px 0; }
+.rb { --u: calc(var(--scale) * .8px); position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: calc(var(--u) * 360); }
+.rb-decor { position: absolute; right: calc(var(--u) * -30); top: calc(var(--u) * -70); font-size: calc(var(--u) * 400); font-weight: 700; line-height: 1; pointer-events: none; }
+.rb-decor.sm { right: calc(var(--u) * -4); top: calc(var(--u) * 14); font-size: calc(var(--u) * 130); }
+.rb-in { position: relative; flex-grow: 1; box-sizing: border-box; padding: calc(var(--u) * 26) 20px calc(var(--u) * 24); display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+.rb-from { display: flex; align-items: center; gap: 10px; font-size: calc(var(--u) * 26); font-weight: 700; }
+.rb-from svg { width: calc(var(--u) * 30); height: calc(var(--u) * 30); flex-shrink: 0; }
+.rb-row { display: flex; align-items: center; justify-content: space-between; }
+.rb-row svg { width: calc(var(--u) * 58); height: calc(var(--u) * 58); }
+.rb-chip { border-radius: 999px; padding: 2px 18px; font-size: calc(var(--u) * 24); font-weight: 700; }
+.rb-big { margin-top: 6px; font-size: calc(var(--u) * 64); font-weight: 700; line-height: 1.1; letter-spacing: -1.5px; white-space: nowrap; }
+.rb-out { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-size: calc(var(--u) * 24); font-weight: 700; }
+.rb-out svg { width: calc(var(--u) * 30); height: calc(var(--u) * 30); flex-shrink: 0; }
+.rb-pill { border-radius: 12px; padding: 2px 14px 4px; font-size: calc(var(--u) * 30); font-weight: 700; line-height: 1.25; }
 
-.step { background: var(--card); border-radius: 1rem; margin-top: 1rem; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-.step-head { display: flex; align-items: center; gap: .6rem; padding: .7rem 1rem; font-size: 1.6rem; }
-.step-head svg { width: 1.9rem; height: 1.9rem; }
-
-.route { --g: min(3.4rem, 58px); position: relative; margin: 1rem min(1rem, 14px) 1.1rem; padding-left: var(--g); }   /* 왼쪽 선 칸은 글씨가 커져도 58px까지만 */
-.route::before { content: ''; position: absolute; left: calc(var(--g) * .41 - 6px); top: 1rem; bottom: 1rem; width: 12px; border-radius: 6px; background: var(--c); }
-.rt-row { position: relative; padding: .35rem 0; }
-.rt-name { display: block; font-size: 1.4rem; font-weight: 800; line-height: 1.25; }
-.rt-node { position: absolute; left: calc(var(--g) * -.59); top: 50%; transform: translate(-50%, -50%); background: #fff; border: 6px solid var(--c); border-radius: 50%; display: grid; place-items: center; color: var(--c); }
-.rt-n-from { width: min(2.3rem, 40px); height: min(2.3rem, 40px); border-width: 4px; }
-.rt-n-from svg { width: 1.2rem; height: 1.2rem; }
-.rt-n-end { width: min(1.6rem, 28px); height: min(1.6rem, 28px); border-radius: .4rem; background: var(--c); }
-.rt-n-next { width: min(2.6rem, 46px); height: min(2.6rem, 46px); border-width: 7px; background: #fff3bf; }
-.rt-next { background: #fff3bf; border: 4px solid #f2c200; border-radius: 1rem; padding: .6rem .7rem; margin: .1rem 0; }
-.rt-chip { display: inline-block; background: var(--ink); color: #fff; border-radius: 999px; padding: .1rem .8rem; font-size: 1rem; font-weight: 800; white-space: nowrap; }
-.rt-chip.out { background: var(--warn); }
-.rt-count { margin-left: .5rem; font-size: 1.05rem; font-weight: 800; white-space: nowrap; }
-.rt-big { display: block; margin-top: .3rem; font-size: 2rem; font-weight: 900; line-height: 1.2; word-break: keep-all; overflow-wrap: anywhere; white-space: nowrap; }
-.rt-move { display: flex; align-items: center; gap: 0 .1rem; padding: .3rem 0; color: var(--c); }
-.rt-move svg { display: block; filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); }
-.rt-move span { margin-left: .5rem; color: var(--ink); font-size: 1.05rem; font-weight: 800; }
-
-.transfer { display: flex; align-items: center; justify-content: center; gap: .6rem; margin-top: 1rem; border: 3px dashed #f59e0b; background: #fff8eb; border-radius: 1rem; padding: .8rem 1rem; font-size: 1.2rem; }
-.transfer .badge { font-size: 1.2rem; }
-.arrive { margin-top: 1rem; background: var(--ok); color: #fff; border-radius: 1rem; padding: 1rem; font-size: 1.4rem; font-weight: 800; text-align: center; }
+.rb-band { --u: calc(var(--scale) * .8px); background: #0b0b0c; color: #fff; min-height: calc(var(--u) * 96); padding: 14px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.rb-bandrow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 12px; }
+.rb-circle { width: calc(var(--u) * 58); height: calc(var(--u) * 58); border-radius: 50%; display: grid; place-items: center; font-size: calc(var(--u) * 34); font-weight: 700; line-height: 1; flex-shrink: 0; }
+.rb-circle.sm { font-size: calc(var(--u) * 18); }
+.rb-bandarrow svg { display: block; width: calc(var(--u) * 36); height: calc(var(--u) * 36); }
+.rb-bandrow b { margin-left: 6px; font-size: calc(var(--u) * 34); font-weight: 700; white-space: nowrap; }
+.rb-band small { font-size: calc(var(--u) * 20); color: #cbd5e1; }

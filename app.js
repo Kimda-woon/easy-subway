@@ -123,7 +123,7 @@
   // ---------- 길 찾기 ----------
   // 다음 역 이름이 칸 너비에 한 줄로 들어오도록 글자 크기를 줄인다 ('역' 글자만 다음 줄로 떨어지는 것 방지)
   function fitNames() {
-    document.querySelectorAll('.rt-big').forEach(function (el) {
+    document.querySelectorAll('.rb-big').forEach(function (el) {
       el.style.whiteSpace = 'nowrap'; el.style.fontSize = '';
       var size = parseFloat(getComputedStyle(el).fontSize);
       while (el.scrollWidth > el.clientWidth && size > 16) { size -= 1; el.style.fontSize = size + 'px'; }
@@ -131,29 +131,45 @@
     });
   }
 
-  // 아이콘 (글자 대신 그림으로)
-  var ICON_CHEV = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 8l7 7 7-7" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  var ICON_TRAIN = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="5" y="2.5" width="14" height="15" rx="4" fill="currentColor"/><rect x="7.5" y="5" width="9" height="5" rx="1.5" fill="#fff"/><circle cx="9" cy="13.5" r="1.4" fill="#fff"/><circle cx="15" cy="13.5" r="1.4" fill="#fff"/><path d="M8 17.5L6 21.5M16 17.5l2 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-  var ICON_SWAP = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 8h14m0 0l-4-4m4 4l-4 4M20 16H6m0 0l4-4m-4 4l4 4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  // ---------- 결과 화면: 호선 색 큰 면 + 큰 글자 ----------
+  // 호선 안에 넣을 짧은 표시 (1~9호선은 숫자)
+  var MARK = { 11: '경의', 12: '분당', 13: '신분당', 14: '공항', 15: 'GTX', 16: '경춘' };
+  function lineMark(l) { return l.id <= 9 ? String(l.id) : MARK[l.id]; }
+  // 밝은 호선색을 어둡게 (흰 이름표 안의 글자색용)
+  function shade(hex, f) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgb(' + Math.round((n >> 16 & 255) * (1 - f)) + ',' + Math.round((n >> 8 & 255) * (1 - f)) + ',' + Math.round((n & 255) * (1 - f)) + ')';
+  }
+  var ICON_TRAIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="15" rx="4" fill="currentColor"/><rect x="7.5" y="5" width="9" height="5" rx="1.5" style="fill:var(--c)"/><circle cx="9" cy="13.5" r="1.4" style="fill:var(--c)"/><circle cx="15" cy="13.5" r="1.4" style="fill:var(--c)"/><path d="M8 17.5L6 21.5M16 17.5l2 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  var ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15m0 0l-6-6m6 6l-6 6"/></svg>';
+  var ICON_FLAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4m0 0h12l-3 4.5L18 13H6"/></svg>';
 
-  // 타는 역 → [다음 역(크게)] → 내리는 역 을 호선 색 선 위에 그린다. 글자는 꼭 필요한 것만.
-  function stepHtml(ride) {
-    var l = ride.line, last = ride.stops === 1;
-    var h = '<div class="step" style="--c:' + l.color + '"><div class="step-head" style="background:' + l.color + ';color:' + l.text + '">' + ICON_TRAIN + '<b>' + l.name + '</b></div>';
-    h += '<div class="route">';
-    h += '<div class="rt-row"><span class="rt-node rt-n-from">' + ICON_TRAIN + '</span><b class="rt-name">' + yeok(ride.from) + '</b></div>';
-    h += '<div class="rt-move">' + ICON_CHEV + ICON_CHEV + ICON_CHEV + '</div>';
-    h += '<div class="rt-row rt-next"><span class="rt-node rt-n-next"></span><span class="rt-chip">다음' + (last ? ' · 내려요' : '') + '</span><b class="rt-big">' + yeok(ride.next) + '</b></div>';
-    if (!last) {
-      h += '<div class="rt-move">' + ICON_CHEV + '</div>';
-      h += '<div class="rt-row"><span class="rt-node rt-n-end"></span><span class="rt-chip out">내려요</span><span class="rt-count">' + ride.stops + '정거장</span><b class="rt-name">' + yeok(ride.to) + '</b></div>';
-    }
-    return h + '</div></div>';
+  // 호선 하나 = 색 면 하나: 타는 역 / 다음 역(가장 크게) / 내리는 역
+  function rideBlock(ride) {
+    var l = ride.line, mark = lineMark(l), light = l.text === '#ffffff';
+    var chipBg = l.text, chipFg = light ? shade(l.color, 0.4) : l.color;
+    var pillBg = light ? '#ffffff' : '#111827', pillFg = light ? '#111827' : '#ffffff';
+    var decor = light ? 'rgba(255,255,255,0.17)' : 'rgba(0,0,0,0.10)';
+    return '<section class="rb" style="--c:' + l.color + ';background:' + l.color + ';color:' + l.text + '">' +
+      '<div class="rb-decor' + (mark.length > 1 ? ' sm' : '') + '" style="color:' + decor + '" aria-hidden="true">' + mark + '</div>' +
+      '<div class="rb-in">' +
+        '<div class="rb-from">' + ICON_TRAIN + '<span>' + yeok(ride.from) + '</span></div>' +
+        '<div><div class="rb-row"><span class="rb-chip" style="background:' + chipBg + ';color:' + chipFg + '">다음 역</span>' + ICON_ARROW + '</div>' +
+          '<div class="rb-big">' + yeok(ride.next) + '</div></div>' +
+        '<div class="rb-out">' + ICON_FLAG + '<span class="rb-pill" style="background:' + pillBg + ';color:' + pillFg + '">' + yeok(ride.to) + '</span><span>에서 내려요</span></div>' +
+      '</div></section>';
   }
 
-  function transferHtml(prev, next) {
+  function circleMark(l) {
+    var m = lineMark(l);
+    return '<span class="rb-circle' + (m.length > 1 ? ' sm' : '') + '" style="background:' + l.color + ';color:' + l.text + '">' + m + '</span>';
+  }
+
+  function transferBand(prev, next) {
     var same = prev.line.id === next.line.id;
-    return '<div class="transfer">' + ICON_SWAP + (same ? '' : badge(next.line)) + '<b>' + (same ? '다른 열차로 ' : '') + '갈아타요</b></div>';
+    return '<div class="rb-band"><div class="rb-bandrow">' + circleMark(prev.line) +
+      '<span class="rb-bandarrow">' + ICON_ARROW + '</span>' + circleMark(next.line) + '<b>갈아타요</b></div>' +
+      (same ? '<small>같은 호선, 다른 열차</small>' : '') + '</div>';
   }
 
   function unresolvedMsg(text, what) {
@@ -184,12 +200,11 @@
     remember(a, b);
 
     var rides = route.rides;
-    var html = '<div class="chain">' + rides.map(function (r) { return badge(r.line); }).join(' <span class="arrow">→</span> ') + '</div>';
+    var html = '';
     rides.forEach(function (ride, i) {
-      if (i > 0) html += transferHtml(rides[i - 1], ride);
-      html += stepHtml(ride);
+      if (i > 0) html += transferBand(rides[i - 1], ride);
+      html += rideBlock(ride);
     });
-    html += '<div class="arrive">🎉 ' + yeok(b) + ' 도착</div>';
 
     var res = $('result');
     res.innerHTML = html;
