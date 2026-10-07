@@ -101,5 +101,3 @@ summary { min-height: 2.8rem; display: flex; align-items: center; font-weight: 7
 
 footer { margin-top: 1.5rem; color: var(--sub); font-size: .85rem; text-align: center; }
 
-.install h2 { margin: 0 0 .5rem; font-size: 1.1rem; }
-.install p { margin: .4rem 0 0; font-size: 1.05rem; }

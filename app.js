@@ -200,19 +200,9 @@
 
   renderRecent();
 
-  // ---------- 홈 화면 설치 ----------
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(function () {});
-  var installEvt = null, installBox = $('install');
-  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
-  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  if (!standalone) {
-    if (ios) { installBox.hidden = false; $('install-btn').hidden = true; $('install-tip').hidden = false; }
-    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); installEvt = e; installBox.hidden = false; $('install-btn').hidden = false; $('install-tip').hidden = true; });
+  // 예전에 설치된 오프라인 저장본(서비스 워커)이 있으면 지워서 항상 최신 버전이 보이게 한다.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+    if (window.caches) caches.keys().then(function (ks) { ks.forEach(function (k) { if (k.indexOf('subway-') === 0) caches.delete(k); }); }).catch(function () {});
   }
-  $('install-btn').addEventListener('click', function () {
-    if (!installEvt) return;
-    installEvt.prompt();
-    installEvt.userChoice.then(function () { installEvt = null; installBox.hidden = true; });
-  });
-  window.addEventListener('appinstalled', function () { installBox.hidden = true; });
 })();
