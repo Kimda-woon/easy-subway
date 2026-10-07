@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="쉬운 지하철">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <!-- 파일을 고칠 때마다 아래 ?v= 값을 바꾸세요. 폰이 옛 파일을 기억하고 있는 것을 막아 줍니다. -->
-  <link rel="stylesheet" href="style.css?v=20261007b">
+  <link rel="stylesheet" href="style.css?v=20261007c">
 </head>
 <body>
   <header class="top">
@@ -55,25 +55,20 @@
 
   </main>
 
-  <!-- 결과 화면: 입력 화면 위에 따로 뜬다. 한 번에 한 단계씩 보여 준다. -->
+  <!-- 결과 화면: 입력 화면 위에 따로 뜬다. 갈아타는 횟수와 상관없이 모든 단계를 한 화면에 보여 준다. -->
   <div id="result" hidden role="dialog" aria-label="가는 길">
     <div class="rv-top">
       <button id="rv-back" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
         다시 찾기
       </button>
-      <div id="rv-dots" aria-hidden="true"></div>
     </div>
     <div id="rv-stage" aria-live="polite"></div>
-    <div class="rv-nav">
-      <button id="rv-prev" type="button">이전</button>
-      <button id="rv-next" type="button">다음</button>
-    </div>
   </div>
 
 
-  <script src="data.js?v=20261007b"></script>
-  <script src="router.js?v=20261007b"></script>
-  <script src="app.js?v=20261007b"></script>
+  <script src="data.js?v=20261007c"></script>
+  <script src="router.js?v=20261007c"></script>
+  <script src="app.js?v=20261007c"></script>
 </body>
 </html>

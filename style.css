@@ -73,41 +73,33 @@ button.ghost { background: #fff; border: 3px solid var(--line); font-size: 1.05r
   display: inline-block; padding: .05rem .6rem; border-radius: 999px; font-weight: 800; font-size: .95em; white-space: nowrap;
 }
 
-/* ---- 결과: 호선 색 큰 면 + 큰 글자 (화면 가장자리까지) ---- */
+/* ---- 결과: 모든 단계를 한 화면에 (호선 색 큰 면 + 큰 글자) ---- */
 #result { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: #0b0b0c; color: #fff; }
-.rv-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; flex-shrink: 0; }
+.rv-top { padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; flex-shrink: 0; }
 #rv-back { min-height: 48px; padding: 0 16px 0 8px; border-radius: 14px; border: 2px solid rgba(255,255,255,.55); background: transparent; color: #fff; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 2px; }
 #rv-back svg { width: 1.5rem; height: 1.5rem; }
-#rv-dots { display: flex; align-items: center; gap: 8px; }
-#rv-dots span { width: 12px; height: 12px; border-radius: 6px; background: rgba(255,255,255,.35); }
-#rv-dots span.on { width: 34px; background: #fff; }
-#rv-stage { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; }
-#rv-stage .rb { flex: 1 0 auto; }
-#rv-stage .rb-band { flex-shrink: 0; }
-.rv-nav { display: flex; gap: 12px; padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); flex-shrink: 0; background: #0b0b0c; }
-.rv-nav button { min-height: 64px; border-radius: 18px; font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
-#rv-prev { flex: 1; background: transparent; border: 2px solid rgba(255,255,255,.55); color: #fff; }
-#rv-next { flex: 2; background: #fff; color: #111827; border: 0; }
-#rv-next.done { background: #ffd84a; }
-#rv-next svg { width: 1.6rem; height: 1.6rem; }
-.rb { --u: calc(var(--scale) * .8px); position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: calc(var(--u) * 360); }
-.rb-decor { position: absolute; right: calc(var(--u) * -30); top: calc(var(--u) * -70); font-size: calc(var(--u) * 400); font-weight: 700; line-height: 1; pointer-events: none; }
-.rb-decor.sm { right: calc(var(--u) * -4); top: calc(var(--u) * 14); font-size: calc(var(--u) * 130); }
-.rb-in { position: relative; flex-grow: 1; box-sizing: border-box; padding: calc(var(--u) * 26) 20px calc(var(--u) * 24); display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+/* --shrink: 한 화면에 다 들어오도록 JS가 정하는 배율 (칸이 많거나 폰이 작으면 작아짐) */
+#rv-stage { --shrink: 1; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; }
+
+.rb, .rb-band { --u: calc(var(--scale) * .8px * var(--shrink)); }
+.rb { position: relative; overflow: hidden; display: flex; flex-direction: column; flex: 1 0 auto; }
+.rb-decor { position: absolute; right: calc(var(--u) * -30); top: calc(var(--u) * -60); font-size: calc(var(--u) * 340); font-weight: 700; line-height: 1; pointer-events: none; }
+.rb-decor.sm { right: calc(var(--u) * -4); top: calc(var(--u) * 10); font-size: calc(var(--u) * 120); }
+.rb-in { position: relative; flex-grow: 1; box-sizing: border-box; padding: calc(var(--u) * 22) 20px calc(var(--u) * 20); display: flex; flex-direction: column; justify-content: space-between; gap: calc(var(--u) * 10); }
 .rb-from { display: flex; align-items: center; gap: 10px; font-size: calc(var(--u) * 26); font-weight: 700; }
 .rb-from svg { width: calc(var(--u) * 30); height: calc(var(--u) * 30); flex-shrink: 0; }
 .rb-row { display: flex; align-items: center; justify-content: space-between; }
-.rb-row svg { width: calc(var(--u) * 58); height: calc(var(--u) * 58); }
-.rb-chip { border-radius: 999px; padding: 2px 18px; font-size: calc(var(--u) * 24); font-weight: 700; }
-.rb-big { margin-top: 6px; font-size: calc(var(--u) * 64); font-weight: 700; line-height: 1.1; letter-spacing: -1.5px; white-space: nowrap; }
+.rb-row svg { width: calc(var(--u) * 46); height: calc(var(--u) * 46); }
+.rb-chip { border-radius: 999px; padding: 2px calc(var(--u) * 18); font-size: calc(var(--u) * 24); font-weight: 700; }
+.rb-big { margin-top: calc(var(--u) * 4); font-size: calc(var(--u) * 64); font-weight: 700; line-height: 1.1; letter-spacing: -1.5px; white-space: nowrap; }
 .rb-out { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-size: calc(var(--u) * 24); font-weight: 700; }
 .rb-out svg { width: calc(var(--u) * 30); height: calc(var(--u) * 30); flex-shrink: 0; }
-.rb-pill { border-radius: 12px; padding: 2px 14px 4px; font-size: calc(var(--u) * 30); font-weight: 700; line-height: 1.25; }
+.rb-pill { border-radius: 12px; padding: 2px calc(var(--u) * 14) calc(var(--u) * 4); font-size: calc(var(--u) * 30); font-weight: 700; line-height: 1.25; }
 
-.rb-band { --u: calc(var(--scale) * .8px); background: #0b0b0c; color: #fff; min-height: calc(var(--u) * 96); padding: 14px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
-.rb-bandrow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 12px; }
-.rb-circle { width: calc(var(--u) * 58); height: calc(var(--u) * 58); border-radius: 50%; display: grid; place-items: center; font-size: calc(var(--u) * 34); font-weight: 700; line-height: 1; flex-shrink: 0; }
-.rb-circle.sm { font-size: calc(var(--u) * 18); }
-.rb-bandarrow svg { display: block; width: calc(var(--u) * 36); height: calc(var(--u) * 36); }
-.rb-bandrow b { margin-left: 6px; font-size: calc(var(--u) * 34); font-weight: 700; white-space: nowrap; }
-.rb-band small { font-size: calc(var(--u) * 20); color: #cbd5e1; }
+.rb-band { background: #0b0b0c; color: #fff; min-height: calc(var(--u) * 78); padding: calc(var(--u) * 10) 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0; }
+.rb-bandrow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px calc(var(--u) * 12); }
+.rb-circle { width: calc(var(--u) * 54); height: calc(var(--u) * 54); border-radius: 50%; display: grid; place-items: center; font-size: calc(var(--u) * 32); font-weight: 700; line-height: 1; flex-shrink: 0; }
+.rb-circle.sm { font-size: calc(var(--u) * 17); }
+.rb-bandarrow svg { display: block; width: calc(var(--u) * 34); height: calc(var(--u) * 34); }
+.rb-bandrow b { margin-left: 6px; font-size: calc(var(--u) * 32); font-weight: 700; white-space: nowrap; }
+.rb-band small { font-size: calc(var(--u) * 19); color: #cbd5e1; }

@@ -14,7 +14,7 @@
     document.documentElement.style.setProperty('--scale', s);
     document.querySelectorAll('.size button').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.scale === s)); });
     save('subway.scale', s);
-    if (typeof fitNames === 'function' && !$('result').hidden) fitNames();
+    if (typeof fitStage === 'function' && !$('result').hidden) fitStage();
   }
   document.querySelector('.size').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (b) setScale(+b.dataset.scale);
@@ -155,7 +155,7 @@
       '<div class="rb-in">' +
         '<div class="rb-from">' + ICON_TRAIN + '<span>' + yeok(ride.from) + '</span></div>' +
         '<div><div class="rb-row"><span class="rb-chip" style="background:' + chipBg + ';color:' + chipFg + '">다음 역</span>' + ICON_ARROW + '</div>' +
-          '<div class="rb-big">' + yeok(ride.next) + '</div></div>' +
+          '<div class="rb-big">' + ride.next + '</div></div>' +
         '<div class="rb-out">' + ICON_FLAG + '<span class="rb-pill" style="background:' + pillBg + ';color:' + pillFg + '">' + yeok(ride.to) + '</span><span>에서 내려요</span></div>' +
       '</div></section>';
   }
@@ -200,38 +200,39 @@
     remember(a, b);
 
     var rides = route.rides;
-    openResult(rides.map(function (ride, i) {
-      return (i > 0 ? transferBand(rides[i - 1], ride) : '') + rideBlock(ride);
-    }));
+    openResult(rides);
   }
 
-  // ---------- 결과 화면: 한 번에 한 단계씩 (스크롤 없이 버튼·쓸어넘기기) ----------
-  var pages = [], cur = 0, lastFocus = null;
+  // ---------- 결과 화면: 모든 단계를 한 화면에 ----------
+  // 화면에 넘치는지 직접 재면서, 모두 들어올 때까지 칸을 조금씩 줄인다 (폰 높이·글씨 크기와 상관없이 스크롤 없이).
+  var lastFocus = null;
+  function fitStage() {
+    var stage = $('rv-stage'), s = 1;
+    stage.style.setProperty('--shrink', s);
+    fitNames();
+    for (var i = 0; i < 40 && stage.scrollHeight > stage.clientHeight + 1 && s > 0.3; i++) {
+      s *= 0.94;
+      stage.style.setProperty('--shrink', s.toFixed(3));
+      fitNames();
+    }
+  }
 
   function setInert(on) {
     ['main', 'header.top'].forEach(function (sel) { var el = document.querySelector(sel); if (el) el.inert = on; });
   }
-  function showPage(i) {
-    cur = Math.max(0, Math.min(pages.length - 1, i));
+  function openResult(rides) {
     var stage = $('rv-stage');
-    stage.innerHTML = pages[cur];
+    stage.innerHTML = rides.map(function (ride, i) {
+      return (i > 0 ? transferBand(rides[i - 1], ride) : '') + rideBlock(ride);
+    }).join('');
     stage.scrollTop = 0;
-    fitNames();
-    $('rv-dots').innerHTML = pages.map(function (_, k) { return '<span class="' + (k === cur ? 'on' : '') + '"></span>'; }).join('');
-    $('rv-prev').style.visibility = cur === 0 ? 'hidden' : 'visible';
-    var last = cur === pages.length - 1;
-    $('rv-next').innerHTML = last ? '처음으로' : '다음 ' + ICON_ARROW;
-    $('rv-next').classList.toggle('done', last);
-  }
-  function openResult(list) {
-    pages = list;
     lastFocus = document.activeElement;
     $('result').hidden = false;
     document.documentElement.style.overflow = 'hidden';
     setInert(true);
     try { history.pushState({ r: 1 }, ''); } catch (e) {}   // 폰의 뒤로가기로도 돌아오게
-    showPage(0);
-    $('rv-next').focus();
+    fitStage();
+    $('rv-back').focus();
   }
   function closeResult(fromPop) {
     if ($('result').hidden) return;
@@ -241,21 +242,10 @@
     if (!fromPop) { try { if (history.state && history.state.r) history.back(); } catch (e) {} }
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
-  $('rv-next').addEventListener('click', function () { if (cur >= pages.length - 1) closeResult(); else showPage(cur + 1); });
-  $('rv-prev').addEventListener('click', function () { showPage(cur - 1); });
   $('rv-back').addEventListener('click', function () { closeResult(); });
   window.addEventListener('popstate', function () { closeResult(true); });
+  window.addEventListener('resize', function () { if (!$('result').hidden) fitStage(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeResult(); });
-  (function () {   // 옆으로 쓸어서 넘기기
-    var sx = 0, sy = 0, stage = $('rv-stage');
-    stage.addEventListener('touchstart', function (e) { sx = e.changedTouches[0].clientX; sy = e.changedTouches[0].clientY; }, { passive: true });
-    stage.addEventListener('touchend', function (e) {
-      var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-      if (dx < 0 && cur < pages.length - 1) showPage(cur + 1);
-      else if (dx > 0 && cur > 0) showPage(cur - 1);
-    }, { passive: true });
-  })();
   $('go').addEventListener('click', find);
 
   renderRecent();
